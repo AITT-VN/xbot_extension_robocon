@@ -1,0 +1,12 @@
+{
+    "name": "ROBOCON",
+    "description": "Thư viện khối lệnh bổ sung cho thi đấu Robocon của robot xBot",
+    "libs": [
+        "robocon_xbot.py"
+    ],
+    "blocks": [
+        "definition.js"
+    ],
+    "toolbox": "toolbox.xml",
+    "poster": "racing.png"
+}
