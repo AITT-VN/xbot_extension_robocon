@@ -35,8 +35,16 @@ def follow_line(speed, port):
     global m_dir, i_lr, t_finding_point
 
     now = line_array.read(port)
-    if now == (0, 0, 0, 0): #no line found
-        robot.backward(speed)
+    if now == (0, 0, 0, 0): 
+        #no line found
+            if m_dir < 4:                            
+                m_dir += 4 #change to go backward or stronger turn
+                robot.set_wheel_speed( speed * speed_factors[m_dir][i_lr], speed * speed_factors[m_dir][1-i_lr] )
+                t_finding_point = time.time_ns()
+            else:
+                if time.time_ns() - t_finding_point > 3e9: #go backward and strong turn still not found then stop after 3s
+                    m_dir = -1
+                    robot.stop()
     else:
         if (now[1], now[2]) == (1, 1):
             if m_dir == 0:
