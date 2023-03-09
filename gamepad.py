@@ -3,6 +3,8 @@ from time import sleep, ticks_ms
 import math
 from micropython import const
 
+from utility import *
+
 _GAMEPAD_RECEIVER_ADDR = const(0x55)
 
 _DPAD_UP = const(0)
@@ -226,8 +228,7 @@ class GamePadReceiver:
         j_distance
     )
 
-  def check_dir(self, direction=-1):
-    angle = gamepad.read_joystick()[2]
+  def check_dir(self,index=0, direction=-1):
 
     # calculate direction based on angle
 
@@ -240,8 +241,10 @@ class GamePadReceiver:
     #   225(6) |  315(8)
 
     #         270(7)
-
+    angle = gamepad.read_joystick(index)[2]
+    
     dir = 0
+    
     if 0 <= angle < 22.5 or angle >= 337.5:
       dir = 1
     elif 22.5 <= angle < 67.5:
@@ -258,7 +261,9 @@ class GamePadReceiver:
       dir = 7
     elif 292.5 <= angle < 337.5:
       dir = 8
-      
+    
+    return dir
+
     if dir == direction:
       return True
     else:

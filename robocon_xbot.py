@@ -156,46 +156,4 @@ def turn_until_condition(m1_speed, m2_speed, condition, timeout=5000):
 
     robot.stop()
 
-gamepad = gamepad
 
-def drive_mode_dpad():
-    if gamepad.data['dpad_up'] and gamepad.data['dpad_left']:
-        robot.move(4)
-    elif gamepad.data['dpad_up'] and gamepad.data['dpad_right']:
-        robot.move(2)
-    elif gamepad.data['dpad_down'] and gamepad.data['dpad_left']:
-        robot.move(6)
-    elif gamepad.data['dpad_down'] and gamepad.data['dpad_right']:
-        robot.move(8)
-    elif gamepad.data['dpad_up']:
-        robot.forward(robot._speed, 0.1, True)
-    elif gamepad.data['dpad_down']:
-        robot.move(7)
-    elif gamepad.data['dpad_left']:
-        robot.move(5)
-    elif gamepad.data['dpad_right']:
-        robot.move(1)
-    else:
-        robot.stop()
-
-
-def drive_mode_left_joystick():
-    
-    if gamepad.data['dpad_up'] and gamepad.data['dpad_left']:
-        robot.move(4)
-    elif gamepad.data['dpad_up'] and gamepad.data['dpad_right']:
-        robot.move(2)
-    elif gamepad.data['dpad_down'] and gamepad.data['dpad_left']:
-        robot.move(6)
-    elif gamepad.data['dpad_down'] and gamepad.data['dpad_right']:
-        robot.move(8)
-    elif gamepad.data['dpad_up']:
-        robot.forward(robot._speed, 0.1, True)
-    elif gamepad.data['dpad_down']:
-        robot.move(7)
-    elif gamepad.data['dpad_left']:
-        robot.move(5)
-    elif gamepad.data['dpad_right']:
-        robot.move(1)
-    else:
-        robot.stop()

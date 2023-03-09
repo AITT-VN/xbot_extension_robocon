@@ -1,16 +1,12 @@
 import time
-from gamepad import *
+from gamepad_handler import *
 from robocon_xbot import *
 
-gamepad._verbose = True
-
-robot._speed = 80
+gamepad_handler.set_mode(1)
+gamepad_handler.set_speed_btn('b', 'a')
+gamepad_handler.set_servo_btn(0, 'x', 'y', 0, 90)
+gamepad_handler.set_servo_btn(1, 'r1', 'l1', 0, 180)
 
 while True:
-  gamepad.update()
-  if gamepad.data['r1']:
-      robot._speed = 100
-  else:
-      robot._speed = 80
-  drive_mode_dpad()
-  time.sleep_ms(20)
+    gamepad_handler.processing()
+    #print('L2: ',gamepad.data['al2'], 'R2: ',gamepad.data['ar2'])
