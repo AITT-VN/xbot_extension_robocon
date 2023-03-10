@@ -7,6 +7,10 @@ from utility import *
 
 _GAMEPAD_RECEIVER_ADDR = const(0x55)
 
+_REG_SET_LED_COLOR = const(0x01)
+_REG_SET_LED_PLAYER = const(0x02)
+_REG_SET_RUMBLE = const(0x03)
+
 _DPAD_UP = const(0)
 _DPAD_DOWN = const(1)
 _DPAD_RIGHT = const(2)
@@ -92,6 +96,9 @@ class GamePadReceiver:
           return (raw - (1<<32))
       else:
           return raw
+
+  def _write(self, address, value):
+      self.i2c.writeto_mem(_GAMEPAD_RECEIVER_ADDR, address, value)
   
   def update(self):
     result = self.i2c.readfrom(_GAMEPAD_RECEIVER_ADDR, 30)
@@ -154,6 +161,24 @@ class GamePadReceiver:
       'sys': (self.misc_buttons >> _MISC_BUTTON_SYSTEM) & 1,
     }
 
+  def set_led_color(self, color):
+      if len(color) != 3 or color[0] < 0 or color[0] > 255 or color[1] < 0 or color[1] > 255 or color[2] < 0 or color[2] > 255:
+        return
+      self._write(_REG_SET_LED_COLOR, bytearray([color[0]. color[1], color[2]]))
+
+  def set_player_led(self, led):
+      if led < 0 or led > 255:
+        return
+      self._write(_REG_SET_LED_PLAYER, bytearray([led]))
+
+  def set_rumble(self, force, duration):
+      if force < 0 or force > 255:
+        return
+
+      if duration < 0 or duration > 255:
+        return
+      self._write(_REG_SET_RUMBLE, bytearray([force, duration]))
+
   
   def calculate_direction(self, angle):
     # calculate direction based on angle
@@ -184,7 +209,6 @@ class GamePadReceiver:
 
 
   def read_joystick(self, index=0): # 0=left, 1=right
-    jx = jy = 0
     x = y = 0
 
     if index ==0:
@@ -225,10 +249,11 @@ class GamePadReceiver:
         x, 
         y,
         angle,
+        self.check_dir(angle), # direction
         j_distance
     )
 
-  def check_dir(self,index=0, direction=-1):
+  def check_dir(self, angle):
 
     # calculate direction based on angle
 
@@ -241,10 +266,9 @@ class GamePadReceiver:
     #   225(6) |  315(8)
 
     #         270(7)
-    angle = gamepad.read_joystick(index)[2]
-    
+
     dir = 0
-    
+
     if 0 <= angle < 22.5 or angle >= 337.5:
       dir = 1
     elif 22.5 <= angle < 67.5:
@@ -261,13 +285,9 @@ class GamePadReceiver:
       dir = 7
     elif 292.5 <= angle < 337.5:
       dir = 8
-    
+
     return dir
 
-    if dir == direction:
-      return True
-    else:
-      return False
 
 i2c = SoftI2C(scl=Pin(22), sda=Pin(21), freq=100000)
 gamepad = GamePadReceiver(i2c)
