@@ -20,8 +20,9 @@ class GamepadHandler():
             self.gamepad = gamepad.GamePadReceiver(self.i2c)
 
             self.gamepad._verbose = False
+            self.filter_btn_data = self.gamepad.data
 
-            self._speed = 60
+            self._speed = 50
             self._speed_turbo = 100
 
             self.drive_mode = MODE_DPAD
@@ -43,6 +44,7 @@ class GamepadHandler():
             self.btnBallLauncherShoot = None
             self.ballLauncherServo1 = 0
             self.ballLauncherServo2 = 1
+
         except:
             self.gamepad = None
             say('Gamepad Receiver not found')
@@ -146,8 +148,6 @@ class GamepadHandler():
     def drive_mode_both_joystick(self):
         # to be implemented
 
-        self._speed = 50  # speed = 50 is good for use both joystick.
-
         j_left = self.gamepad.read_joystick(0)
         j_right = self.gamepad.read_joystick(1)
 
@@ -190,6 +190,16 @@ class GamepadHandler():
         if j_left[3] == 0 and j_right[3] == 0:
             robot.stop()
 
+    def filter_btn(self, data=None):
+        self.filter_btn_data[data] = (self.filter_btn_data[data] if isinstance(
+            self.filter_btn_data[data], (int, float)) else 0) + 1
+
+        if self.filter_btn_data[data] > 1:
+            self.filter_btn_data[data] = 0
+            #print(data, 'is filtered')
+            return False
+        return True
+
     def process(self):
         if self.gamepad != None:
 
@@ -198,10 +208,11 @@ class GamepadHandler():
             if self.is_connected():
 
                 if self.gamepad.data[self.btnChangeMode]:
-                    self.drive_mode = (self.drive_mode if isinstance(
-                        self.drive_mode, (int, float)) else 0) + 1
-                    if self.drive_mode > 4:
-                        self.drive_mode = 1
+                    if self.filter_btn(self.btnChangeMode):
+                        self.drive_mode = (self.drive_mode if isinstance(
+                            self.drive_mode, (int, float)) else 0) + 1
+                        if self.drive_mode > 4:
+                            self.drive_mode = 1
 
                 if self.drive_mode == MODE_DPAD:
                     self.drive_mode_dpad()
@@ -218,13 +229,13 @@ class GamepadHandler():
 
                 if self.gamepad.data[self.btnIncr]:
                     self._speed = (self._speed if isinstance(
-                        self._speed, (int, float)) else 0) + 1
+                        self._speed, (int, float)) else 0) + 5
                     if self._speed > 100:
                         self._speed = 100
 
                 if self.gamepad.data[self.btnDecr]:
                     self._speed = (self._speed if isinstance(
-                        self._speed, (int, float)) else 0) - 1
+                        self._speed, (int, float)) else 0) - 5
                     if self._speed < 0:
                         self._speed = 0
 
@@ -243,14 +254,14 @@ class GamepadHandler():
 
                 if (self.btnBallLauncherLoad != None) or (self.btnBallLauncherShoot != None):
                     if self.gamepad.data[self.btnBallLauncherLoad]:
-                        time.sleep_ms(250)
-                        ball_launcher(self.ballLauncherServo1,
-                                      self.ballLauncherServo2, mode=0)
+                        if self.filter_btn(self.btnBallLauncherLoad):
+                            ball_launcher(self.ballLauncherServo1,
+                                          self.ballLauncherServo2, mode=0)
 
                     if self.gamepad.data[self.btnBallLauncherShoot]:
-                        time.sleep_ms(250)
-                        ball_launcher(self.ballLauncherServo1,
-                                      self.ballLauncherServo2, mode=1)
+                        if self.filter_btn(self.btnBallLauncherShoot):
+                            ball_launcher(self.ballLauncherServo1,
+                                          self.ballLauncherServo2, mode=1)
 
                 for i in range(len(self.servoVal)):
                     if self.gamepad.data[self.servoVal[i][0]]:
@@ -259,8 +270,7 @@ class GamepadHandler():
                         servo.position(i, self.servoVal[i][3])
 
             # print('Mode: ',self.drive_mode ,'Speed: ', robot._speed)
-            # If it's < 120, when you click button some activities be duplicated.
-            time.sleep_ms(120)
+            time.sleep_ms(10)
 
 
 gamepad_handler = GamepadHandler()
