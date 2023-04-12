@@ -228,10 +228,19 @@ Blockly.Blocks['gamepad_init'] = {
     this.jsonInit(
       {
         type: "gamepad_init",
-        message0: "khởi tạo gamepad",
+        message0: "khởi tạo gamepad cổng %1",
         previousStatement: null,
         nextStatement: null,
         args0: [
+          {
+            type: "field_dropdown",
+            name: "port",
+            options: [
+              ["4", "3"],
+              ["5", "4"],
+              ["6", "5"],
+            ],
+          },
         ],
         colour: ColorBlock,
         tooltip: "",
@@ -245,7 +254,9 @@ Blockly.Blocks['gamepad_init'] = {
 };
 
 Blockly.Python['gamepad_init'] = function (block) {
+  var port = block.getFieldValue("port");
   Blockly.Python.definitions_['import_gamepad'] = 'from gamepad_handler import *';
+  Blockly.Python.definitions_['init_gamepad'] = 'gamepad_handler = GamepadHandler(' + port + ')';
   // TODO: Assemble Python into code variable.
   var code = "";
   return code;

@@ -1,6 +1,7 @@
 import machine
 from machine import Pin, SoftI2C
 from robocon_xbot import *
+from setting import *
 from utility import *
 from micropython import const
 import time
@@ -12,12 +13,19 @@ MODE_RIGHT_JOYSTICK = const(3)
 MODE_BOTH_JOYSTICK = const(4)
 
 
-class GamepadHandler():
+class GamepadHandler:
 
-    def __init__(self):
+    def __init__(self, port):
+
+        self.port = port
+        # Grove port: GND VCC SCL SDA
+        scl_pin = Pin(PORTS_DIGITAL[port][0])
+        sda_pin = Pin(PORTS_DIGITAL[port][1])
+
         try:
-            self.i2c = SoftI2C(scl=Pin(22), sda=Pin(21), freq=100000)
-            self.gamepad = gamepad.GamePadReceiver(self.i2c)
+            self.i2c_gp = SoftI2C(scl=scl_pin, sda=sda_pin, freq=100000)
+
+            self.gamepad = gamepad.GamePadReceiver(self.i2c_gp)
 
             self.gamepad._verbose = False
             self.filter_btn_data = self.gamepad.data
@@ -47,6 +55,7 @@ class GamepadHandler():
 
         except:
             self.gamepad = None
+            self.port = None
             say('Gamepad Receiver not found')
 
     def is_connected(self):
@@ -228,14 +237,14 @@ class GamepadHandler():
                     self.set_led_color('#800080')
 
                 if self.gamepad.data[self.btnIncr]:
-                    if self.filter_btn_data(self.btnIncr):
+                    if self.filter_btn(self.btnIncr):
                         self._speed = (self._speed if isinstance(
                             self._speed, (int, float)) else 0) + 5
                         if self._speed > 100:
                             self._speed = 100
 
                 if self.gamepad.data[self.btnDecr]:
-                    if self.filter_btn_data(self.btnDecr):
+                    if self.filter_btn(self.btnDecr):
                         self._speed = (self._speed if isinstance(
                             self._speed, (int, float)) else 0) - 5
                         if self._speed < 0:
@@ -275,4 +284,4 @@ class GamepadHandler():
             time.sleep_ms(10)
 
 
-gamepad_handler = GamepadHandler()
+#gamepad_handler = GamepadHandler(3)
