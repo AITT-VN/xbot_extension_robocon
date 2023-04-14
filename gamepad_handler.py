@@ -47,6 +47,7 @@ class GamepadHandler:
 
             self.colorVal = '#0000ff'
             self.servoVal = {}
+            self.servo_last_angle = [0, 0, 0, 0, 0, 0, 0, 0]
 
             self.btnBallLauncherLoad = None
             self.btnBallLauncherShoot = None
@@ -68,7 +69,7 @@ class GamepadHandler:
         self.btnIncr = btnIncr
         self.btnDecr = btnDecr
 
-    def set_servo_btn(self, index=0, btn1='x', btn2='y', angle1=0, angle2=90):
+    def set_servo_btn(self, index=0, btn1='x', btn2='y', angle1=0, angle2=90, speed=100):
         if index < 0 or index > 7:
             return
 
@@ -78,7 +79,10 @@ class GamepadHandler:
         if angle1 < 0 or angle2 > 180:
             return
 
-        self.servoVal[index] = [btn1, btn2, angle1, angle2]
+        if speed < 0 or speed > 100:
+            return
+
+        self.servoVal[index] = [btn1, btn2, angle1, angle2, speed]
 
     def set_ball_launcher_btn(self, index1=0, index2=1, btn1='x', btn2='y'):
         self.ballLauncherServo1 = index1
@@ -209,6 +213,34 @@ class GamepadHandler:
             return False
         return True
 
+    def driving_servo(self, index, next_angle, speed=100):
+        last_angle = self.servo_last_angle[index]
+        # speed of movement
+        sleep = translate(speed, 0, 100, 40, 0)
+
+        if speed == 0:
+            return
+
+        # limit min/max values
+        if next_angle < 0:
+            next_angle = 0
+        if next_angle > 180:
+            next_angle = 180
+
+        if next_angle > last_angle:
+            for k in range(last_angle, next_angle):
+                servo.position(index, k)
+                last_angle = next_angle
+                time.sleep_ms(int(sleep))
+        else:
+            for k in range(last_angle, next_angle, -1):
+                servo.position(index, k)
+                last_angle = next_angle
+                time.sleep_ms(int(sleep))
+
+        self.servo_last_angle[index] = next_angle
+        # print(self.servo_last_angle)
+
     def process(self):
         if self.gamepad != None:
 
@@ -276,9 +308,13 @@ class GamepadHandler:
 
                 for i in range(len(self.servoVal)):
                     if self.gamepad.data[self.servoVal[i][0]]:
-                        servo.position(i, self.servoVal[i][2])
+                        self.driving_servo(
+                            i, self.servoVal[i][2], self.servoVal[i][4])
+                        #servo.position(i, self.servoVal[i][2])
                     if self.gamepad.data[self.servoVal[i][1]]:
-                        servo.position(i, self.servoVal[i][3])
+                        self.driving_servo(
+                            i, self.servoVal[i][3], self.servoVal[i][4])
+                        #servo.position(i, self.servoVal[i][3])
 
             # print('Mode: ',self.drive_mode ,'Speed: ', robot._speed)
             time.sleep_ms(10)
