@@ -122,17 +122,20 @@ def turn_until_line_detected(m1_speed, m2_speed, port, timeout=5000):
 
     while time.ticks_ms() - last_time < timeout:
     
-        current_line_status = line_array.read(port, sensor_index)
+        line_sensors = line_array.read(port)
+        current_line_status = line_sensors[sensor_index]
 
         if current_line_status == 1: # black line detected
-	          # ignore case when robot is still on black line since started turning
+            # ignore case when robot is still on black line since started turning
             if last_line_status == 1 or time.ticks_ms() - last_time < 500:
                 continue
             else:
+                
                 if not sensor1:
-                  sensor1 = line_array.read(port, sensor_indices[0])
+                  sensor1 = line_sensors[sensor_indices[0]]
                 if not sensor2:
-                  sensor2 = line_array.read(port, sensor_indices[1])
+                  sensor2 = line_sensors[sensor_indices[0]]
+
                 if sensor1 and sensor2:
                 # only considered as black line detected after 3 times reading
                 #if count > 3:
@@ -161,3 +164,17 @@ def turn_until_condition(m1_speed, m2_speed, condition, timeout=5000):
         time.sleep_ms(10)
 
     robot.stop()
+
+
+def ball_launcher(servo_1=0, servo_2=1, mode=-1):
+    if mode == 1:
+        servo.position(servo_1, 180)
+    if mode == 0:
+        servo.position(servo_1, 180)
+        time.sleep_ms(250)
+        servo.position(servo_2, 180)
+        time.sleep_ms(250)
+        servo.position(servo_1, 90)
+        time.sleep_ms(250)
+        servo.position(servo_2, 20)
+        time.sleep_ms(250)
