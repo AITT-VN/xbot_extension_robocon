@@ -1063,6 +1063,170 @@ Blockly.Python['gamepad_set_gripper'] = function (block) {
   return code;
 };
 
+Blockly.Blocks['gamepad_set_forklift'] = {
+  init: function () {
+    this.jsonInit(
+      {
+        type: "gamepad_set_forklift",
+        message0: "cài đặt đầu nâng %1 : %2 để mở %3 để đóng",
+        previousStatement: null,
+        nextStatement: null,
+        args0: [
+          {
+            type: "field_dropdown",
+            name: "servo",
+            options: [
+              ["S1", "0"],
+              ["S2", "1"],
+              ["S3", "2"],
+              ["S4", "3"],
+              ["S5", "4"],
+              ["S6", "5"],
+              ["S7", "6"],
+              ["S8", "7"],
+            ],
+          },
+          {
+            type: "field_dropdown",
+            name: "btn1",
+            options: [
+              [
+                {
+                  "src": ImgUrl + 'ico-square.png',
+                  "width": 15,
+                  "height": 15,
+                  "alt": "*"
+                },
+                "square"
+              ],
+              [
+                {
+                  "src": ImgUrl + 'ico-circle.png',
+                  "width": 15,
+                  "height": 15,
+                  "alt": "*"
+                },
+                "circle"
+              ],
+              [
+                {
+                  "src": ImgUrl + 'ico-cross.png',
+                  "width": 15,
+                  "height": 15,
+                  "alt": "*"
+                },
+                "cross"
+              ],
+              [
+                {
+                  "src": ImgUrl + 'ico-triangle.png',
+                  "width": 15,
+                  "height": 15,
+                  "alt": "*"
+                },
+                "triangle"
+              ],
+              ["A", "a"],
+              ["B", "b"],
+              ["X", "x"],
+              ["Y", "y"],
+              ["R1", "r1"],
+              ["L1", "l1"],
+              ["R2", "r2"],
+              ["L2", "l2"],
+              ["options", "m2"],
+              ["share", "m1"],
+              ["nút joystick trái", "thumbl"],
+              ["nút joystick phải", "thumbr"],
+            ],
+          },
+          {
+            type: "field_dropdown",
+            name: "btn2",
+            options: [
+              [
+                {
+                  "src": ImgUrl + 'ico-triangle.png',
+                  "width": 15,
+                  "height": 15,
+                  "alt": "*"
+                },
+                "triangle"
+              ],
+              [
+                {
+                  "src": ImgUrl + 'ico-circle.png',
+                  "width": 15,
+                  "height": 15,
+                  "alt": "*"
+                },
+                "circle"
+              ],
+              [
+                {
+                  "src": ImgUrl + 'ico-cross.png',
+                  "width": 15,
+                  "height": 15,
+                  "alt": "*"
+                },
+                "cross"
+              ],
+              [
+                {
+                  "src": ImgUrl + 'ico-square.png',
+                  "width": 15,
+                  "height": 15,
+                  "alt": "*"
+                },
+                "square"
+              ],
+              ["A", "a"],
+              ["B", "b"],
+              ["X", "x"],
+              ["Y", "y"],
+              ["R1", "r1"],
+              ["L1", "l1"],
+              ["R2", "r2"],
+              ["L2", "l2"],
+              ["options", "m2"],
+              ["share", "m1"],
+              ["nút joystick trái", "thumbl"],
+              ["nút joystick phải", "thumbr"],
+            ],
+          }],
+        inputsInline: true,
+        previousStatement: null,
+        nextStatement: null,
+        colour: ColorBlock,
+        tooltip: "",
+        helpUrl: ""
+      }
+    );
+  },
+  getDeveloperVars: function () {
+    return ['gamepad_handler'];
+  }
+};
+
+Blockly.Python['gamepad_set_forklift'] = function (block) {
+  var servo = block.getFieldValue('servo');
+  var btn1 = block.getFieldValue('btn1');
+  var btn2 = block.getFieldValue('btn2');
+
+  if (btn1 == 'square') btn1 = 'x';
+  else if (btn1 == 'triangle') btn1 = 'y';
+  else if (btn1 == 'cross') btn1 = 'a';
+  else if (btn1 == 'circle') btn1 = 'b';
+  if (btn2 == 'square') btn2 = 'x';
+  else if (btn2 == 'triangle') btn2 = 'y';
+  else if (btn2 == 'cross') btn2 = 'a';
+  else if (btn2 == 'circle') btn2 = 'b';
+
+  // TODO: Assemble Python into code variable.
+  var code = "gamepad_handler.set_servo_fork_btn(" + servo + ", '" + btn1 + "', '" + btn2 + "', 0, 90)\n";
+  return code;
+};
+
 Blockly.Blocks['gamepad_set_ball_launcher'] = {
   init: function () {
     this.jsonInit(

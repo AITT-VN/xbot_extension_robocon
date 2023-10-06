@@ -84,6 +84,21 @@ class GamepadHandler:
 
         self.servoVal[index] = [btn1, btn2, angle1, angle2, speed]
 
+    def set_servo_fork_btn(self, index=0, btn1='x', btn2='y', angle1=0, angle2=90, speed=100):
+        if index < 0 or index > 7:
+            return
+
+        if angle1 < 0 or angle2 > 180:
+            return
+
+        if angle1 < 0 or angle2 > 180:
+            return
+
+        if speed < 0 or speed > 100:
+            return
+
+        self.servoVal[index] = [btn1, btn2, angle1, angle2, speed]
+
     def set_ball_launcher_btn(self, index1=0, index2=1, btn1='x', btn2='y'):
         self.ballLauncherServo1 = index1
         self.ballLauncherServo2 = index2
