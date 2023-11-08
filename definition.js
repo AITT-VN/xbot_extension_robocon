@@ -256,7 +256,7 @@ Blockly.Blocks['gamepad_init'] = {
 Blockly.Python['gamepad_init'] = function (block) {
   var port = block.getFieldValue("port");
   Blockly.Python.definitions_['import_gamepad'] = 'from gamepad_handler import *';
-  Blockly.Python.definitions_['init_gamepad'] = 'gamepad_handler = GamepadHandler(' + port + ')';
+  Blockly.Python.definitions_['create_gamepad'] = 'gamepad_handler = GamepadHandler(' + port + ')';
   // TODO: Assemble Python into code variable.
   var code = "";
   return code;
