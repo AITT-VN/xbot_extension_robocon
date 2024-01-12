@@ -1,4 +1,4 @@
-import machine
+import machine, time
 
 # support libs
 from setting import *
@@ -20,31 +20,48 @@ from robot import robot
 # wireless libs
 from ble import ble_o, ble
 #from wifi import *
+
+STOP = const(0)
+BRAKE = const(1)
+
+def stop_then(then=STOP):
+    if then == STOP:
+        robot.stop()
+    elif then == BRAKE:
+        if device_config.get('hardware_version') == 1.3:
+            motor._pin(11, 100)
+            motor._pin(12, 100)
+            motor._pin(13, 100)
+            motor._pin(14, 100)
+        else:
+            motor._pin(11, True)
+            motor._pin(12, True)
+            motor._pin(13, True)
+            motor._pin(14, True)
+        time.sleep_ms(150)
+        robot.stop()
+    else:
+        return
+
 speed_factors = [ 
     [1, 1], [0.5, 1], [0, 1], [-0.5, 0.5], 
     [-2/3, -2/3], [0, 1], [-0.5, 0.5], [-0.7, 0.7] 
 ] 
 #0: forward, 1: light turn, 2: normal turn, 3: heavy turn, 4:  backward, 5: strong light turn, 6: strong normal turn, 7: strong heavy turn
-
-
+            
 m_dir = -1 #no found
 i_lr = 0 #0 for left, 1 for right
 t_finding_point = time.time_ns()
+servo_current_position = [0, 0, 0, 0, 0, 0, 0, 0]
 
-def follow_line(speed, port):
+def follow_line(speed, port, now=None, backward=True):
     global m_dir, i_lr, t_finding_point
+    if now == None:
+        now = line_array.read(port)
 
-    now = line_array.read(port)
-    if now == (0, 0, 0, 0): 
-        #no line found
-            if m_dir < 4:                            
-                m_dir += 4 #change to go backward or stronger turn
-                robot.set_wheel_speed( speed * speed_factors[m_dir][i_lr], speed * speed_factors[m_dir][1-i_lr] )
-                t_finding_point = time.time_ns()
-            else:
-                if time.time_ns() - t_finding_point > 3e9: #go backward and strong turn still not found then stop after 3s
-                    m_dir = -1
-                    robot.stop()
+    if now == (0, 0, 0, 0):
+        if backward:
+            robot.backward(speed) 
     else:
         if (now[1], now[2]) == (1, 1):
             if m_dir == 0:
@@ -85,15 +102,71 @@ def follow_line(speed, port):
                 i_lr = 1
 
             robot.set_wheel_speed( speed * speed_factors[m_dir][i_lr], speed * speed_factors[m_dir][1-i_lr] )
-def follow_line_until(speed, condition, port, timeout=10000):
+
+def follow_line_until_end(speed, port, timeout=10000, then=STOP):
+    count = 3
+    last_time = time.ticks_ms()
+
+    while time.ticks_ms() - last_time < timeout:
+        now = line_array.read(port)
+
+        if now == (0, 0, 0, 0):
+            count = count - 1
+            if count == 0:
+                break
+
+        if speed >= 0:
+            follow_line(speed, port, now, False)
+        else:
+            robot.backward(abs(speed))
+
+        time.sleep_ms(10)
+
+    stop_rover(then)
+
+def follow_line_until_cross(speed, port, timeout=10000, then=STOP):
+    status = 1
     count = 0
     last_time = time.ticks_ms()
 
     while time.ticks_ms() - last_time < timeout:
-        if condition():
-            count = count + 1
-            if count == 3:
-                break
+        now = line_array.read(port)
+
+        if status == 1:
+            if now != (1, 1, 1, 1):
+                status = 2
+        elif status == 2:
+            if now == (1, 1, 1, 1):
+                count = count + 1
+                if count == 2:
+                    break
+
+        if speed >= 0:
+            follow_line(speed, port, now)
+        else:
+            robot.backward(abs(speed))
+
+        time.sleep_ms(10)
+
+    robot.forward(speed, 0.1)
+    stop_rover(then)
+
+def follow_line_until(speed, condition, port, timeout=10000, then=STOP):
+    status = 1
+    count = 0
+    last_time = time.ticks_ms()
+
+    while time.ticks_ms() - last_time < timeout:
+        now = line_array.read(port)
+
+        if status == 1:
+            if now != (1, 1, 1, 1):
+                status = 2
+        elif status == 2:
+            if condition():
+                count = count + 1
+                if count == 2:
+                    break
 
         if speed >= 0:
             follow_line(speed, port)
@@ -102,53 +175,39 @@ def follow_line_until(speed, condition, port, timeout=10000):
 
         time.sleep_ms(10)
 
-    robot.stop()
+    stop_rover(then)
 
-def turn_until_line_detected(m1_speed, m2_speed, port, timeout=5000):
-    count = 0
-    sensor_index = 2
-    sensor_indices = [1, 2]
-    sensor1 = 0
-    sensor2 = 0
-    if m1_speed > m2_speed:
-        sensor_index = 3
-        sensor_indices = [3, 4]
- 
-    last_line_status = line_array.read(port, sensor_index)
-  
-    robot.set_wheel_speed(m1_speed, m2_speed)
+def turn_until_line_detected(m1_speed, m2_speed, port, timeout=5000, then=STOP):
+    counter = 0
+    status = 0
   
     last_time = time.ticks_ms()
 
+    robot.set_wheel_speed(m1_speed, m2_speed)
+
     while time.ticks_ms() - last_time < timeout:
-    
-        line_sensors = line_array.read(port)
-        current_line_status = line_sensors[sensor_index]
+        line_status = line_array.read(port)
 
-        if current_line_status == 1: # black line detected
-            # ignore case when robot is still on black line since started turning
-            if last_line_status == 1 or time.ticks_ms() - last_time < 500:
-                continue
-            else:
-                
-                if not sensor1:
-                  sensor1 = line_sensors[sensor_indices[0]]
-                if not sensor2:
-                  sensor2 = line_sensors[sensor_indices[0]]
-
-                if sensor1 and sensor2:
-                # only considered as black line detected after 3 times reading
-                #if count > 3:
-                    robot.stop()
+        if status == 0:
+            if line_status == (0, 0, 0, 0): # no black line detected
+                # ignore case when robot is still on black line since started turning
+                status = 1
+        
+        elif status == 1:
+            robot.set_wheel_speed(m1_speed, m2_speed)
+            status = 2
+            counter = 3
+        elif status == 2:
+            if line_status[0] == 1 or line_status[1] == 1 or line_status[2] == 1 or line_status[3] == 1:
+                robot.set_wheel_speed(int(m1_speed*0.75), int(m2_speed*0.75))
+                counter = counter - 1
+                if counter <= 0:
                     break
-                #else:
-                #    count = count + 1
-        else: # meet white background
-            last_line_status = 0
-  
+
         time.sleep_ms(10)
 
-    robot.stop()
+    stop_rover(then)
+
 def turn_until_condition(m1_speed, m2_speed, condition, timeout=5000):
     count = 0
 
@@ -165,7 +224,6 @@ def turn_until_condition(m1_speed, m2_speed, condition, timeout=5000):
 
     robot.stop()
 
-
 def ball_launcher(servo_1=0, servo_2=1, mode=-1):
     if mode == 1:
         servo.position(servo_1, 180)
@@ -178,3 +236,32 @@ def ball_launcher(servo_1=0, servo_2=1, mode=-1):
         time.sleep_ms(250)
         servo.position(servo_2, 20)
         time.sleep_ms(250)
+
+def set_servo_position(index, next_position, speed=70):
+    global servo_current_position
+    last_angle = servo_current_position[index]
+    # speed of movement
+    sleep = translate(speed, 0, 100, 40, 0)
+
+    if speed == 0:
+        return
+
+    # limit min/max values
+    if next_position < 0:
+        next_position = 0
+    if next_position > 180:
+        next_position = 180
+
+    if next_position > last_angle:
+        for k in range(last_angle, next_position):
+            servo.position(index, k)
+            last_angle = next_position
+            time.sleep_ms(int(sleep))
+    else:
+        for k in range(last_angle, next_position, -1):
+            servo.position(index, k)
+            last_angle = next_position
+            time.sleep_ms(int(sleep))
+
+    servo_current_position[index] = next_position
+    # print(self.servo_last_angle)

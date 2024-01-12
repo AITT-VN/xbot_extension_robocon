@@ -1,5 +1,65 @@
 <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
   <category name="ROBOCON" colour="#44cbc6" icon="flag">
+    <block type="robocon_follow_line_until_cross">
+      <value name="speed">
+        <shadow type="math_number">
+          <field name="NUM">30</field>
+        </shadow>
+      </value>
+    </block>
+
+    <block type="robocon_turn_until_line_detected_then">
+      <value name="speed">
+        <shadow type="math_number">
+          <field name="NUM">30</field>
+        </shadow>
+      </value>
+    </block>
+    
+    <block type="robocon_follow_line_until_end">
+      <value name="speed">
+        <shadow type="math_number">
+          <field name="NUM">30</field>
+        </shadow>
+      </value>
+    </block>
+
+    <block type="robocon_follow_line_delay">
+      <value name="speed">
+        <shadow type="math_number">
+          <field name="NUM">30</field>
+        </shadow>
+      </value>
+      <value name="timeout">
+        <shadow type="math_number">
+          <field name="NUM">5</field>
+        </shadow>
+      </value>
+    </block>
+
+    <block type="control_gripper">
+      <value name="speed">
+        <shadow type="math_number">
+          <field name="NUM">70</field>
+        </shadow>
+      </value>
+    </block>
+
+    <block type="control_servo">
+      <value name="angle">
+        <shadow type="math_number">
+          <field name="NUM">30</field>
+        </shadow>
+      </value>
+      <value name="speed">
+        <shadow type="math_number">
+          <field name="NUM">70</field>
+        </shadow>
+      </value>
+    </block>
+
+    <sep gap="60"></sep>
+
     <block type="robocon_follow_line_until">
       <value name="speed">
         <shadow type="math_number">
@@ -14,18 +74,7 @@
         </shadow>
       </value>
     </block>
-    <block type="robocon_follow_line_delay">
-      <value name="speed">
-        <shadow type="math_number">
-          <field name="NUM">30</field>
-        </shadow>
-      </value>
-      <value name="timeout">
-        <shadow type="math_number">
-          <field name="NUM">5</field>
-        </shadow>
-      </value>
-    </block>
+    
     <block type="robocon_turn_until_line_detected">
       <value name="m1_speed">
         <shadow type="math_number">
@@ -43,6 +92,7 @@
         </shadow>
       </value>
     </block>
+
     <block type="robocon_turn_until_condition">
       <value name="m1_speed">
         <shadow type="math_number">
