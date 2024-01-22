@@ -3,6 +3,204 @@ const ImgUrl = 'https://ohstem-public.s3.ap-southeast-1.amazonaws.com/extensions
 
 // ROBOCON BLOCK
 
+Blockly.Blocks['robocon_follow_line_until_cross'] = {
+  init: function () {
+    this.jsonInit(
+      {
+        "type": "robocon_follow_line_until_cross",
+        "message0": "dò line cổng %1 tốc độ %2 gặp vạch ngang rồi %3",
+        "args0": [
+          {
+            type: "field_dropdown",
+            name: "port",
+            options: [
+              ["1", "0"],
+              ["2", "1"],
+              ["3", "2"],
+              ["4", "3"],
+              ["5", "4"],
+              ["6", "5"],
+            ],
+          },
+          {
+            type: "input_value",
+            check: "Number",
+            value: 50,
+            name: "speed",
+          },
+          {
+            type: "field_dropdown",
+            name: "stop",
+            options: [
+              ["dừng và khóa bánh", "BRAKE"],
+              ["dừng lại", "STOP"],
+              ["không làm gì", "None"],
+            ]
+          },
+        ],
+        "inputsInline": true,
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": ColorBlock,
+        "tooltip": "",
+        "helpUrl": ""
+      }
+    );
+  }
+};
+
+Blockly.Python["robocon_follow_line_until_cross"] = function (block) {
+  Blockly.Python.definitions_['import_robocon'] = 'from robocon_xbot import *';
+  var speed = Blockly.Python.valueToCode(block, 'speed', Blockly.Python.ORDER_ATOMIC);
+  var port = block.getFieldValue('port');
+  var stop = block.getFieldValue('stop');
+  // TODO: Assemble Python into code variable.
+  var code = "follow_line_until_cross(" + speed + ", " + port + ", 15000, " + stop + ")\n";
+  return code;
+};
+
+Blockly.Blocks['robocon_follow_line_until_end'] = {
+  init: function () {
+    this.jsonInit(
+      {
+        "type": "robocon_follow_line_until_end",
+        "message0": "dò line cổng %1 tốc độ %2 đến cuối vạch đen rồi %3",
+        "args0": [
+          {
+            type: "field_dropdown",
+            name: "port",
+            options: [
+              ["1", "0"],
+              ["2", "1"],
+              ["3", "2"],
+              ["4", "3"],
+              ["5", "4"],
+              ["6", "5"],
+            ],
+          },
+          {
+            type: "input_value",
+            check: "Number",
+            value: 50,
+            name: "speed",
+          },
+          {
+            type: "field_dropdown",
+            name: "stop",
+            options: [
+              ["dừng và khóa bánh", "BRAKE"],
+              ["dừng lại", "STOP"],
+              ["không làm gì", "None"],
+            ]
+          },
+        ],
+        "inputsInline": true,
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": ColorBlock,
+        "tooltip": "",
+        "helpUrl": ""
+      }
+    );
+  }
+};
+
+Blockly.Python["robocon_follow_line_until_end"] = function (block) {
+  Blockly.Python.definitions_['import_robocon'] = 'from robocon_xbot import *';
+  var speed = Blockly.Python.valueToCode(block, 'speed', Blockly.Python.ORDER_ATOMIC);
+  var port = block.getFieldValue('port');
+  var stop = block.getFieldValue('stop');
+  // TODO: Assemble Python into code variable.
+  var code = "follow_line_until_end(" + speed + ", " + port + ", 15000, " + stop + ")\n";
+  return code;
+};
+
+Blockly.Blocks['robocon_turn_until_line_detected_then'] = {
+  init: function () {
+    this.jsonInit(
+      {
+        "type": "robocon_turn_until_line_detected_then",
+        "message0": "cảm biến dò line cổng %1 quay %2 tốc độ %3 gặp vạch đen rồi %4",
+        "args0": [
+          {
+            "type": "field_dropdown",
+            "name": "port",
+            "options": [
+              ["1", "0"],
+              ["2", "1"],
+              ["3", "2"],
+              ["4", "3"],
+              ["5", "4"],
+              ["6", "5"],
+            ],
+          },
+          {
+            "type": "field_dropdown",
+            "name": "direction",
+            "options": [
+              [
+                {
+                  "src": "static/blocks/block_images/860774.svg",
+                  "width": 15,
+                  "height": 15,
+                  "alt": "*"
+                },
+                "left"
+              ],
+              [
+                {
+                  "src": "static/blocks/block_images/74474.svg",
+                  "width": 15,
+                  "height": 15,
+                  "alt": "*"
+                },
+                "right"
+              ]
+            ]
+          },
+          {
+            "type": "input_value",
+            "name": "speed",
+            "check": "Number",
+          },
+          {
+            "type": "field_dropdown",
+            "name": "stop",
+            "options": [
+              ["dừng và khóa bánh", "BRAKE"],
+              ["dừng lại", "STOP"],
+              ["không làm gì", "None"],
+            ]
+          },
+        ],
+        "inputsInline": true,
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": ColorBlock,
+        "tooltip": "",
+        "helpUrl": ""
+      }
+    );
+  }
+};
+
+Blockly.Python["robocon_turn_until_line_detected_then"] = function (block) {
+  Blockly.Python.definitions_['import_robocon'] = 'from robocon_xbot import *';
+  var dir = block.getFieldValue('direction');
+  var speed = Blockly.Python.valueToCode(block, 'speed', Blockly.Python.ORDER_ATOMIC);
+  var port = block.getFieldValue('port');
+  var stop = block.getFieldValue('stop');
+  // TODO: Assemble Python into code variable.
+  var code = "";
+  if (dir == "left") {
+    code = "turn_until_line_detected(" + -speed + ", " + speed + ", " + port + ", 5000, " + stop + ")\n";
+  } else {
+    code = "turn_until_line_detected(" + speed + ", " + -speed + ", " + port + ", 5000, " + stop + ")\n";
+  }
+  return code;
+};
+
+// OLD
 Blockly.Blocks['robocon_follow_line_until'] = {
   init: function () {
     this.jsonInit(
@@ -48,6 +246,7 @@ Blockly.Blocks['robocon_follow_line_until'] = {
     );
   }
 };
+
 Blockly.Python["robocon_follow_line_until"] = function (block) {
   Blockly.Python.definitions_['import_robocon'] = 'from robocon_xbot import *';
   var speed = Blockly.Python.valueToCode(block, 'speed', Blockly.Python.ORDER_ATOMIC);
@@ -1514,4 +1713,111 @@ Blockly.Python["gamepad_is_connected"] = function (block) {
   // TODO: Assemble Python into code variable.
   var code = "gamepad_handler.is_connected()";
   return [code, Blockly.Python.ORDER_NONE];
+};
+
+// 10-01-2024
+
+Blockly.Blocks['control_servo'] = {
+  init: function () {
+    this.jsonInit(
+      {
+        "type": "control_servo",
+        "message0": "servo %1 quay %2 độ tốc độ %3 (0-100)",
+        "args0": [
+          {
+            type: "field_dropdown",
+            name: "pin",
+            options: [
+              ["S1", "0"],
+              ["S2", "1"],
+              ["S3", "2"],
+              ["S4", "3"],
+              ["S5", "4"],
+              ["S6", "5"],
+              ["S7", "6"],
+              ["S8", "7"],
+            ],
+          },
+          {
+            "type": "input_value",
+            "name": "angle",
+            "check": "Number",
+          },
+          {
+            "type": "input_value",
+            "name": "speed",
+            "check": "Number",
+          }
+        ],
+        "inputsInline": true,
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": ColorBlock,
+        "tooltip": "",
+        "helpUrl": ""
+      }
+    );
+  }
+};
+
+Blockly.Python["control_servo"] = function (block) {
+  Blockly.Python.definitions_['import_robocon'] = 'from robocon_xbot import *';
+  var angle_servo = Blockly.Python.valueToCode(block, 'angle', Blockly.Python.ORDER_ATOMIC);
+  var dropdown_pin = block.getFieldValue('pin');
+  var servo_speed = Blockly.Python.valueToCode(block, 'speed', Blockly.Python.ORDER_ATOMIC);
+  // TODO: Assemble Python into code variable.
+  var code = "set_servo_position(" + dropdown_pin + ", " + angle_servo + ", " + servo_speed + ")\n";
+  return code;
+};
+
+Blockly.Blocks['control_gripper'] = {
+  init: function () {
+    this.jsonInit(
+      {
+        "type": "control_gripper",
+        "message0": "%1 tay gắp tốc độ %2 (0-100)",
+        "args0": [
+          {
+            type: "field_dropdown",
+            name: "action",
+            options: [
+              ["nâng", "lift_up"],
+              ["hạ", "lift_down"],
+              ["đóng", "collect"],
+              ["mở", "release"],
+            ]
+          },
+          {
+            "type": "input_value",
+            "name": "speed",
+            "check": "Number",
+          }
+        ],
+        "inputsInline": true,
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": ColorBlock,
+        "tooltip": "",
+        "helpUrl": ""
+      }
+    );
+  }
+};
+
+Blockly.Python["control_gripper"] = function (block) {
+  Blockly.Python.definitions_['import_robocon'] = 'from robocon_xbot import *';
+  var dropdown_type = block.getFieldValue('action');
+  var rotate_speed = Blockly.Python.valueToCode(block, 'speed', Blockly.Python.ORDER_ATOMIC);
+  // TODO: Assemble Python into code variable.
+  var code = "";
+  if (dropdown_type == 'collect')
+    code = "set_servo_position(0, 90, " + rotate_speed + ")\n";
+  else if (dropdown_type == 'release')
+    code = "set_servo_position(0, 0, " + rotate_speed + ")\n";
+  else if (dropdown_type == 'lift_up')
+    code = "set_servo_position(1, 90, " + rotate_speed + ")\n";
+  else
+    code = "set_servo_position(1, 0, " + rotate_speed + ")\n";
+  // TODO: Change ORDER_NONE to the correct strength.
+  return code;
 };
