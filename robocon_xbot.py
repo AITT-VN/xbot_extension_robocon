@@ -44,8 +44,8 @@ def stop_xbot(then=STOP):
         return
 
 speed_factors = [ 
-    [1, 1], [2/3, 1], [0, 3/5], [-3/5, 3/5], 
-    [-2/3, -2/3], [0, 3/5], [-0.5, 0.5], [-4/5, 4/5] 
+    [1, 1], [0.7, 1], [0, 1], [-0.5, 0.5], 
+    [-2/3, -2/3], [0, 1], [-0.5, 0.5], [-0.7, 0.7] 
 ] 
 #0: forward, 1: light turn, 2: normal turn, 3: heavy turn, 4:  backward, 5: strong light turn, 6: strong normal turn, 7: strong heavy turn
             
@@ -61,21 +61,15 @@ def follow_line(speed, port, now=None, backward=True):
 
     if now == (0, 0, 0, 0):
         #no line found
-        if m_dir < 4:                            
-            m_dir += 4 #change to go backward or stronger turn
-            robot.set_wheel_speed( speed * speed_factors[m_dir][i_lr], speed * speed_factors[m_dir][1-i_lr] )
-            t_finding_point = time.time_ns()
-        else:
-            if time.time_ns() - t_finding_point > 3e9: #go backward and strong turn still not found then stop after 3s
-                m_dir = -1
-                robot.stop()
+        if backward:
+            robot.backward(int(speed*0.7))
     else:
         if (now[1], now[2]) == (1, 1):
             if m_dir == 0:
                 robot.set_wheel_speed(speed, speed) #if it is running straight before then robot should speed up now           
             else:
                 m_dir = 0 #forward
-                robot.set_wheel_speed(speed * 2/3, speed * 2/3) #just turn before, shouldn't set high speed immediately, speed up slowly
+                robot.set_wheel_speed(speed * 0.7, speed * 0.7) #just turn before, shouldn't set high speed immediately, speed up slowly
         else:
             if (now[0], now[1]) == (1, 1): 
                 m_dir = 2 #left normal turn
@@ -108,35 +102,58 @@ def follow_line(speed, port, now=None, backward=True):
                 m_dir = 3 #right heavy turn
                 i_lr = 1
 
-            robot.set_wheel_speed( speed * speed_factors[m_dir][i_lr], speed * speed_factors[m_dir][1-i_lr] )
+            #print(m_dir)
+            left_speed = speed * speed_factors[m_dir][i_lr]
+            if left_speed < 0 and left_speed > -30:
+                left_speed = -30
+            if left_speed > 0 and left_speed < 30:
+                left_speed = 30
+            right_speed = speed * speed_factors[m_dir][1-i_lr]
+            if right_speed < 0 and right_speed > -30:
+                right_speed = -30
+            if right_speed > 0 and right_speed < 30:
+                right_speed = 30
+
+            robot.set_wheel_speed(left_speed, right_speed)
+
+            if m_dir == 3:
+                while now[1] != 1 and now[2] != 1:
+                    time.sleep_ms(20)
+                    now = line_array.read(port)
 
 def follow_line_until_end(speed, port, timeout=10000, then=STOP):
     count = 3
     last_time = time.ticks_ms()
 
     while time.ticks_ms() - last_time < timeout:
+        sleep_time = 20
         now = line_array.read(port)
 
         if now == (0, 0, 0, 0):
             count = count - 1
             if count == 0:
                 break
+            speed = int(speed/2) # slow down when end condition met
+            if speed < 30:
+                speed = 30
+            sleep_time = sleep_time + 10
 
         if speed >= 0:
             follow_line(speed, port, now, False)
         else:
             robot.backward(abs(speed))
 
-        time.sleep_ms(10)
+        time.sleep_ms(sleep_time)
 
     stop_xbot(then)
 
-def follow_line_until_cross(speed, port, timeout=10000, then=STOP):
+def follow_line_until_cross(speed, port, timeout=20000, then=STOP):
     status = 1
     count = 0
     last_time = time.ticks_ms()
 
     while time.ticks_ms() - last_time < timeout:
+        sleep_time = 20
         now = line_array.read(port)
 
         if status == 1:
@@ -147,18 +164,22 @@ def follow_line_until_cross(speed, port, timeout=10000, then=STOP):
                 count = count + 1
                 if count == 2:
                     break
+                speed = int(speed/2) # slow down when end condition met
+                if speed < 30:
+                    speed = 30
+                sleep_time = sleep_time + 10
 
         if speed >= 0:
             follow_line(speed, port, now)
         else:
             robot.backward(abs(speed))
 
-        time.sleep_ms(10)
+        time.sleep_ms(sleep_time)
 
     robot.forward(speed, 0.1)
     stop_xbot(then)
 
-def follow_line_until(speed, condition, port, timeout=10000, then=STOP):
+def follow_line_until(speed, condition, port, timeout=20000, then=STOP):
     status = 1
     count = 0
     last_time = time.ticks_ms()
@@ -172,7 +193,7 @@ def follow_line_until(speed, condition, port, timeout=10000, then=STOP):
         elif status == 2:
             if condition():
                 count = count + 1
-                if count == 2:
+                if count == 3:
                     break
 
         if speed >= 0:
