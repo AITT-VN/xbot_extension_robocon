@@ -153,8 +153,8 @@ def follow_line_until_cross(speed, port, timeout=20000, then=STOP):
     last_time = time.ticks_ms()
 
     while time.ticks_ms() - last_time < timeout:
-        sleep_time = 20
         now = line_array.read(port)
+        adjust_speed = speed
 
         if status == 1:
             if now != (1, 1, 1, 1):
@@ -162,19 +162,20 @@ def follow_line_until_cross(speed, port, timeout=20000, then=STOP):
         elif status == 2:
             if now == (1, 1, 1, 1):
                 count = count + 1
-                if count == 2:
+                if count == 4:
                     break
-                speed = int(speed/2) # slow down when end condition met
+                adjust_speed = int(speed/2) # slow down when end condition met
                 if speed < 30:
                     speed = 30
-                sleep_time = sleep_time + 10
+            else:
+                adjust_speed = speed
 
         if speed >= 0:
-            follow_line(speed, port, now)
+            follow_line(adjust_speed, port, now)
         else:
             robot.backward(abs(speed))
 
-        time.sleep_ms(sleep_time)
+        time.sleep_ms(10)
 
     robot.forward(speed, 0.1)
     stop_xbot(then)
@@ -224,7 +225,7 @@ def turn_until_line_detected(m1_speed, m2_speed, port, timeout=5000, then=STOP):
         elif status == 1:
             robot.set_wheel_speed(m1_speed, m2_speed)
             status = 2
-            counter = 3
+            counter = 4
         elif status == 2:
             if line_status[0] == 1 or line_status[1] == 1 or line_status[2] == 1 or line_status[3] == 1:
                 robot.set_wheel_speed(int(m1_speed*0.75), int(m2_speed*0.75))
