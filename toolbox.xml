@@ -112,6 +112,13 @@
         </shadow>
       </value>
     </block>
+
+    <sep gap="30"></sep>
+    <label text="Gamepad" web-class="blockLabelStyle"></label>
+
+    <block type="xbot_remote_control_init"/>
+    <block type="xbot_remote_control_processing"/>
+    <block type="xbot_remote_control_on_button_pressed" />
   </category>
 
   <category name="GAMEPAD" colour="#44cbc6" icon="gamepad">

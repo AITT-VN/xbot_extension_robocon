@@ -1821,3 +1821,129 @@ Blockly.Python["control_gripper"] = function (block) {
   // TODO: Change ORDER_NONE to the correct strength.
   return code;
 };
+
+
+// REMOTE CONTROL BLOCK
+
+Blockly.Blocks['xbot_remote_control_init'] = {
+  init: function () {
+    this.jsonInit(
+      {
+        type: "xbot_remote_control_init",
+        message0: "khởi tạo gamepad cổng %1",
+        args0: [
+          {
+            type: "field_dropdown",
+            name: "port",
+            options: [
+              ["4", "3"],
+              ["5", "4"],
+              ["6", "5"],
+            ],
+          },
+        ],
+        previousStatement: null,
+        nextStatement: null,
+        colour: ColorBlock,
+        tooltip: "",
+        helpUrl: ""
+      }
+    )
+  },
+  getDeveloperVars: function () {
+    return ['rc_mode'];
+  }
+};
+
+Blockly.Python['xbot_remote_control_init'] = function (block) {
+  var port = block.getFieldValue("port");
+  // TODO: Assemble Python into code variable.
+  Blockly.Python.definitions_['import_remote_control'] = 'from remote_control import *\n';
+  Blockly.Python.definitions_['import_remote_control_init'] = "rc_mode = RemoteControlMode(" + port + ")\n"
+  var code = "";
+  return code;
+};
+
+Blockly.Blocks['xbot_remote_control_processing'] = {
+  init: function () {
+    this.jsonInit(
+      {
+        type: "xbot_remote_control_processing",
+        message0: "xử lý lệnh từ gamepad",
+        previousStatement: null,
+        nextStatement: null,
+        args0: [
+        ],
+        colour: ColorBlock,
+        tooltip: "",
+        helpUrl: ""
+      }
+    )
+  },
+  getDeveloperVars: function () {
+    return ['rc_mode'];
+  }
+};
+
+Blockly.Python['xbot_remote_control_processing'] = function (block) {
+  // TODO: Assemble Python into code variable.
+  var code = "rc_mode.run()\n";
+  return code;
+};
+
+Blockly.Blocks["xbot_remote_control_on_button_pressed"] = {
+  init: function () {
+    this.jsonInit({
+      colour: ColorBlock,
+      message0: "nếu nút %1 trên gamepad được nhấn %2 %3 ",
+      tooltip: "Thực hiện một tập lệnh khi nút gamepad được nhấn",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "BUTTON",
+          options: [
+            ['A', 'A'],
+            ['B', 'B'],
+            ['C', 'C'],
+            ['D', 'D']
+          ],
+        },
+        {
+          type: "input_dummy",
+        },
+        {
+          type: "input_statement",
+          name: "ACTION",
+        },
+      ],
+      helpUrl: "",
+    });
+  },
+  getDeveloperVars: function () {
+    return ['rc_mode'];
+  }
+};
+
+Blockly.Python['xbot_remote_control_on_button_pressed'] = function (block) {
+  Blockly.Python.definitions_['import_remote_control'] = 'from remote_control import *';
+  var button = block.getFieldValue('BUTTON');
+  var statements_action = Blockly.Python.statementToCode(block, 'ACTION');
+
+  var globals = buildGlobalString(block);
+
+  var cbFunctionName = Blockly.Python.provideFunction_(
+    'on_gamepad_button_' + button,
+    (globals != '') ?
+      ['def ' + Blockly.Python.FUNCTION_NAME_PLACEHOLDER_ + '():',
+        globals,
+      statements_action || Blockly.Python.PASS
+      ] :
+      ['def ' + Blockly.Python.FUNCTION_NAME_PLACEHOLDER_ + '():',
+      statements_action || Blockly.Python.PASS
+      ]);
+
+  var code = 'rc_mode.set_command(BTN_' + button + ', ' + cbFunctionName + ')\n';
+  Blockly.Python.definitions_['on_gamepad_button_callback' + button] = code;
+
+  return '';
+};

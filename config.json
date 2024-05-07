@@ -4,7 +4,8 @@
     "libs": [
         "robocon_xbot.py",
         "gamepad.py",
-        "gamepad_handler.py"
+        "gamepad_handler.py",
+        "remote_control.py"
     ],
     "blocks": [
         "definition.js"
