@@ -17,6 +17,10 @@ BTN_A = '!B11:'
 BTN_B = '!B219'
 BTN_C = '!B318'
 BTN_D = '!B417'
+BTN_L1 = 'L1'
+BTN_R1 = 'R1'
+BTN_L2 = 'L2'
+BTN_R2 = 'R2'
 
 BTN_RELEASED = '!507'
 
@@ -84,6 +88,14 @@ class RemoteControlMode():
                     self._cmd = BTN_A
                 elif self._gamepad_v2.data['y']:
                     self._cmd = BTN_B
+                elif self._gamepad_v2.data['l1']:
+                    self._cmd = BTN_L1
+                elif self._gamepad_v2.data['l2']:
+                    self._cmd = BTN_L2
+                elif self._gamepad_v2.data['r1']:
+                    self._cmd = BTN_R1
+                elif self._gamepad_v2.data['r2']:
+                    self._cmd = BTN_R2
                 else:
                     self._cmd = BTN_RELEASED
 

@@ -1905,7 +1905,11 @@ Blockly.Blocks["xbot_remote_control_on_button_pressed"] = {
             ['A', 'A'],
             ['B', 'B'],
             ['C', 'C'],
-            ['D', 'D']
+            ['D', 'D'],
+            ['L1', 'L1'],
+            ['R1', 'R1'],
+            ['L2', 'L2'],
+            ['R2', 'R2'],
           ],
         },
         {
