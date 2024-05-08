@@ -37,6 +37,10 @@ class RemoteControlMode():
             BTN_B: None,
             BTN_C: None,
             BTN_D: None,
+            BTN_L1: None,
+            BTN_R1: None,
+            BTN_L2: None,
+            BTN_R2: None,
         }
 
         self.port = port

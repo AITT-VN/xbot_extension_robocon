@@ -1902,10 +1902,42 @@ Blockly.Blocks["xbot_remote_control_on_button_pressed"] = {
           type: "field_dropdown",
           name: "BUTTON",
           options: [
-            ['A', 'A'],
-            ['B', 'B'],
-            ['C', 'C'],
-            ['D', 'D'],
+            [
+              {
+                "src": ImgUrl + 'ico-cross.png',
+                "width": 15,
+                "height": 15,
+                "alt": "*"
+              },
+              "C"
+            ],
+            [
+              {
+                "src": ImgUrl + 'ico-circle.png',
+                "width": 15,
+                "height": 15,
+                "alt": "*"
+              },
+              "D"
+            ],
+            [
+              {
+                "src": ImgUrl + 'ico-square.png',
+                "width": 15,
+                "height": 15,
+                "alt": "*"
+              },
+              "A"
+            ],
+            [
+              {
+                "src": ImgUrl + 'ico-triangle.png',
+                "width": 15,
+                "height": 15,
+                "alt": "*"
+              },
+              "B"
+            ],
             ['L1', 'L1'],
             ['R1', 'R1'],
             ['L2', 'L2'],
