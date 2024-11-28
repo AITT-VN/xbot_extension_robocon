@@ -1775,7 +1775,7 @@ Blockly.Blocks['control_gripper'] = {
     this.jsonInit(
       {
         "type": "control_gripper",
-        "message0": "%1 tay gắp tốc độ %2 (0-100)",
+        "message0": "%1 tay gắp %3 tốc độ %2 (0-100)",
         "args0": [
           {
             type: "field_dropdown",
@@ -1791,7 +1791,21 @@ Blockly.Blocks['control_gripper'] = {
             "type": "input_value",
             "name": "speed",
             "check": "Number",
-          }
+          },
+          {
+            type: "field_dropdown",
+            name: "pin",
+            options: [
+              ["S1", "0"],
+              ["S2", "1"],
+              ["S3", "2"],
+              ["S4", "3"],
+              ["S5", "4"],
+              ["S6", "5"],
+              ["S7", "6"],
+              ["S8", "7"],
+            ],
+          },
         ],
         "inputsInline": true,
         "previousStatement": null,
@@ -1807,17 +1821,18 @@ Blockly.Blocks['control_gripper'] = {
 Blockly.Python["control_gripper"] = function (block) {
   Blockly.Python.definitions_['import_robocon'] = 'from robocon_xbot import *';
   var dropdown_type = block.getFieldValue('action');
+  var dropdown_pin = block.getFieldValue('pin');
   var rotate_speed = Blockly.Python.valueToCode(block, 'speed', Blockly.Python.ORDER_ATOMIC);
   // TODO: Assemble Python into code variable.
   var code = "";
   if (dropdown_type == 'collect')
-    code = "set_servo_position(0, 90, " + rotate_speed + ")\n";
+    code = "set_servo_position(" + dropdown_pin + ", 90, " + rotate_speed + ")\n";
   else if (dropdown_type == 'release')
-    code = "set_servo_position(0, 0, " + rotate_speed + ")\n";
+    code = "set_servo_position(" + dropdown_pin + ", 0, " + rotate_speed + ")\n";
   else if (dropdown_type == 'lift_up')
-    code = "set_servo_position(1, 90, " + rotate_speed + ")\n";
+    code = "set_servo_position(" + dropdown_pin + ", 90, " + rotate_speed + ")\n";
   else
-    code = "set_servo_position(1, 0, " + rotate_speed + ")\n";
+    code = "set_servo_position(" + dropdown_pin + ", 0, " + rotate_speed + ")\n";
   // TODO: Change ORDER_NONE to the correct strength.
   return code;
 };
@@ -1902,6 +1917,10 @@ Blockly.Blocks["xbot_remote_control_on_button_pressed"] = {
           type: "field_dropdown",
           name: "BUTTON",
           options: [
+            ['A', 'BTN_A'],
+            ['B', 'BTN_B'],
+            ['C', 'BTN_C'],
+            ['D', 'BTN_D'],
             [
               {
                 "src": ImgUrl + 'ico-cross.png',
@@ -1909,7 +1928,7 @@ Blockly.Blocks["xbot_remote_control_on_button_pressed"] = {
                 "height": 15,
                 "alt": "*"
               },
-              "C"
+              "BTN_CROSS"
             ],
             [
               {
@@ -1918,7 +1937,7 @@ Blockly.Blocks["xbot_remote_control_on_button_pressed"] = {
                 "height": 15,
                 "alt": "*"
               },
-              "D"
+              "BTN_CIRCLE"
             ],
             [
               {
@@ -1927,7 +1946,7 @@ Blockly.Blocks["xbot_remote_control_on_button_pressed"] = {
                 "height": 15,
                 "alt": "*"
               },
-              "A"
+              "BTN_SQUARE"
             ],
             [
               {
@@ -1936,12 +1955,52 @@ Blockly.Blocks["xbot_remote_control_on_button_pressed"] = {
                 "height": 15,
                 "alt": "*"
               },
-              "B"
+              "BTN_TRIANGLE"
             ],
-            ['L1', 'L1'],
-            ['R1', 'R1'],
-            ['L2', 'L2'],
-            ['R2', 'R2'],
+            ["L1", "BTN_L1"],
+            ["R1", "BTN_R1"],
+            ["L2", "BTN_L2"],
+            ["R2", "BTN_R2"],
+            ["SHARE", "BTN_M1"],
+            ["OPTIONS", "BTN_M2"],
+            ["Left Joystick", "BTN_THUMBL"],
+            ["Right Joystick", "BTN_THUMBR"],
+            [
+              {
+                "src": "static/blocks/block_images/59043.svg",
+                "width": 15,
+                "height": 15,
+                "alt": "*"
+              },
+              "BTN_UP"
+            ],
+            [
+              {
+                "src": "static/blocks/block_images/959159.svg",
+                "width": 15,
+                "height": 15,
+                "alt": "*"
+              },
+              "BTN_DOWN"
+            ],
+            [
+              {
+                "src": "static/blocks/block_images/arrow-left.svg",
+                "width": 15,
+                "height": 15,
+                "alt": "side left"
+              },
+              "BTN_LEFT"
+            ],
+            [
+              {
+                "src": "static/blocks/block_images/arrow-right.svg",
+                "width": 15,
+                "height": 15,
+                "alt": "side right"
+              },
+              "BTN_RIGHT"
+            ],
           ],
         },
         {
@@ -1978,8 +2037,57 @@ Blockly.Python['xbot_remote_control_on_button_pressed'] = function (block) {
       statements_action || Blockly.Python.PASS
       ]);
 
-  var code = 'rc_mode.set_command(BTN_' + button + ', ' + cbFunctionName + ')\n';
+  var code = 'rc_mode.set_command(' + button + ', ' + cbFunctionName + ')\n';
   Blockly.Python.definitions_['on_gamepad_button_callback' + button] = code;
 
   return '';
+  
+};
+
+Blockly.Blocks['xbot_control_gripper_slow'] = {
+  init: function () {
+    this.jsonInit(
+      {
+        "type": "xbot_control_gripper_slow",
+        "message0": "servo %2 %1 độ",
+        "args0": [
+          {
+            "type": "input_value",
+            "name": "angle",
+            "check": "Number",
+          },
+          {
+            type: "field_dropdown",
+            name: "pin",
+            options: [
+              ["S1", "0"],
+              ["S2", "1"],
+              ["S3", "2"],
+              ["S4", "3"],
+              ["S5", "4"],
+              ["S6", "5"],
+              ["S7", "6"],
+              ["S8", "7"],
+            ],
+          }
+        ],
+        "inputsInline": true,
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": ColorBlock,
+        "tooltip": "",
+        "helpUrl": ""
+      }
+    );
+  }
+};
+
+Blockly.Python["xbot_control_gripper_slow"] = function (block) {
+  Blockly.Python.definitions_['import_robocon'] = 'from robocon_xbot import *';
+  var pin = block.getFieldValue('pin');
+  var angle = Blockly.Python.valueToCode(block, 'angle', Blockly.Python.ORDER_ATOMIC);
+  // TODO: Assemble Python into code variable.
+  var code = "move_servo_position(" + pin + "," + angle + ")\n";
+  
+  return code;
 };

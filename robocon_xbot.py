@@ -53,6 +53,7 @@ m_dir = -1 #no found
 i_lr = 0 #0 for left, 1 for right
 t_finding_point = time.time_ns()
 servo_current_position = [0, 0, 0, 0, 0, 0, 0, 0]
+robocon_servos_pos = {}
 
 def follow_line(speed, port, now=None, backward=True):
     global m_dir, i_lr, t_finding_point
@@ -266,31 +267,51 @@ def ball_launcher(servo_1=0, servo_2=1, mode=-1):
         servo.position(servo_2, 20)
         time.sleep_ms(250)
 
-def set_servo_position(index, next_position, speed=70):
-    global servo_current_position
-    last_angle = servo_current_position[index]
-    # speed of movement
-    sleep = translate(speed, 0, 100, 40, 0)
+def set_servo(index, angle):
+    global servo_current_position, robocon_servos_pos    
+    servo.position(index, angle)
+    robocon_servos_pos[index] = angle
 
-    if speed == 0:
-        return
+def set_servo_position(pin, next_position, speed=70):
+    global servo_current_position, robocon_servos_pos
+    if speed < 0:
+        speed = 0
+    elif speed > 100:
+        speed = 100
+    
+    sleep = int(translate(speed, 0, 100, 40, 0))
 
-    # limit min/max values
+    if pin in robocon_servos_pos:
+        current_position = robocon_servos_pos[pin]
+    else:
+        current_position = 0
+        set_servo(pin, 0) # first time control
+
+    if next_position < current_position:
+        for i in range(current_position, next_position, -1):
+            set_servo(pin, i)
+            time.sleep_ms(sleep)
+    else:
+        for i in range(current_position, next_position):
+            set_servo(pin, i)
+            time.sleep_ms(sleep)
+
+
+def move_servo_position(pin, angle):
+    global servo_current_position, robocon_servos_pos
+    
+    if pin in robocon_servos_pos:
+        current_position = robocon_servos_pos[pin]
+    else:
+        current_position = 0
+        
+    next_position = current_position + angle
+    
     if next_position < 0:
         next_position = 0
     if next_position > 180:
         next_position = 180
+    set_servo(pin, next_position)
 
-    if next_position > last_angle:
-        for k in range(last_angle, next_position):
-            servo.position(index, k)
-            last_angle = next_position
-            time.sleep_ms(int(sleep))
-    else:
-        for k in range(last_angle, next_position, -1):
-            servo.position(index, k)
-            last_angle = next_position
-            time.sleep_ms(int(sleep))
 
-    servo_current_position[index] = next_position
-    # print(self.servo_last_angle)
+

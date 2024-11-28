@@ -8,6 +8,7 @@ import gamepad
 
 GAMEPAD_RECEIVER_ADDR = const(0x55)
 
+# gamepad buttons
 BTN_FORWARD = '!B516'
 BTN_BACKWARD = '!B615'
 BTN_LEFT = '!B714'
@@ -17,10 +18,32 @@ BTN_A = '!B11:'
 BTN_B = '!B219'
 BTN_C = '!B318'
 BTN_D = '!B417'
+
+BTN_SQUARE = 'SQ'
+BTN_TRIANGLE = 'TR'
+BTN_CROSS = 'CR'
+BTN_CIRCLE = 'CI'
+
 BTN_L1 = 'L1'
 BTN_R1 = 'R1'
 BTN_L2 = 'L2'
 BTN_R2 = 'R2'
+
+BTN_M1 = 'M1'
+BTN_M2 = 'M2'
+BTN_THUMBL = 'THUMBL'
+BTN_THUMBR = 'THUMBR'
+
+AL = 'AL'
+ALX = 'ALX'
+ALY = 'ALY'
+AL_DIR = 'AL_DIR'
+AL_DISTANCE = 'AL_DISTANCE'
+AR = 'AR'
+ARX = 'ARX'
+ARY = 'ARY'
+AR_DIR = 'AR_DIR'
+AR_DISTANCE = 'AR_DISTANCE'
 
 BTN_RELEASED = '!507'
 
@@ -33,14 +56,30 @@ class RemoteControlMode():
         self._last_cmd = None
         
         self._cmd_handlers = {
+            BTN_FORWARD: None,
+            BTN_BACKWARD: None,
+            BTN_LEFT: None,
+            BTN_RIGHT: None,
+
             BTN_A: None,
             BTN_B: None,
             BTN_C: None,
             BTN_D: None,
+
+            BTN_SQUARE: None,
+            BTN_TRIANGLE: None,
+            BTN_CROSS: None,
+            BTN_CIRCLE: None,
+
             BTN_L1: None,
             BTN_R1: None,
             BTN_L2: None,
             BTN_R2: None,
+
+            BTN_M1: None,
+            BTN_M2: None,
+            BTN_THUMBL: None,
+            BTN_THUMBR: None,
         }
 
         self.port = port
@@ -85,21 +124,29 @@ class RemoteControlMode():
                 elif self._gamepad_v2.data['dpad_right']:
                     self._cmd = BTN_RIGHT
                 elif self._gamepad_v2.data['a']:
-                    self._cmd = BTN_C
+                    self._cmd = BTN_CROSS
                 elif self._gamepad_v2.data['b']:
-                    self._cmd = BTN_D
+                    self._cmd = BTN_CIRCLE
                 elif self._gamepad_v2.data['x']:
-                    self._cmd = BTN_A
+                    self._cmd = BTN_SQUARE
                 elif self._gamepad_v2.data['y']:
-                    self._cmd = BTN_B
+                    self._cmd = BTN_TRIANGLE
                 elif self._gamepad_v2.data['l1']:
                     self._cmd = BTN_L1
-                elif self._gamepad_v2.data['l2']:
-                    self._cmd = BTN_L2
                 elif self._gamepad_v2.data['r1']:
                     self._cmd = BTN_R1
+                elif self._gamepad_v2.data['l2']:
+                    self._cmd = BTN_L2
                 elif self._gamepad_v2.data['r2']:
                     self._cmd = BTN_R2
+                elif self._gamepad_v2.data['m1']:
+                    self._cmd = BTN_M1
+                elif self._gamepad_v2.data['m2']:
+                    self._cmd = BTN_M2
+                elif self._gamepad_v2.data['thumbl']:
+                    self._cmd = BTN_THUMBL
+                elif self._gamepad_v2.data['thumbr']:
+                    self._cmd = BTN_THUMBR
                 else:
                     self._cmd = BTN_RELEASED
 
@@ -157,3 +204,4 @@ while True:
     time.sleep_ms(50)
 
 '''
+
