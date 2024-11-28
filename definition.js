@@ -2049,7 +2049,7 @@ Blockly.Blocks['xbot_control_gripper_slow'] = {
     this.jsonInit(
       {
         "type": "xbot_control_gripper_slow",
-        "message0": "servo %2 %1 độ",
+        "message0": "servo %2 xoay %1 độ",
         "args0": [
           {
             "type": "input_value",
