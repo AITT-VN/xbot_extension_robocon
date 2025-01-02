@@ -1972,7 +1972,7 @@ Blockly.Blocks["xbot_remote_control_on_button_pressed"] = {
                 "height": 15,
                 "alt": "*"
               },
-              "BTN_UP"
+              "BTN_FORWARD"
             ],
             [
               {
@@ -1981,7 +1981,7 @@ Blockly.Blocks["xbot_remote_control_on_button_pressed"] = {
                 "height": 15,
                 "alt": "*"
               },
-              "BTN_DOWN"
+              "BTN_BACKWARD"
             ],
             [
               {
