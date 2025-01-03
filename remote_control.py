@@ -158,11 +158,20 @@ class RemoteControlMode():
             else:
                 self._speed = 50
 
-        if self._cmd == BTN_FORWARD:
-            robot.forward(self._speed*2)
+        if self._cmd_handlers.get(self._cmd) != None:
+            self._cmd_handlers[self._cmd]()
+            
+        elif self._cmd == BTN_FORWARD:
+            s = self._speed*2
+            if s > 100:
+                s = 100
+            robot.forward(s)
 
         elif self._cmd == BTN_BACKWARD:
-            robot.backward(self._speed*2)
+            s = self._speed*2
+            if s > 100:
+                s = 100
+            robot.backward(s)
 
         elif self._cmd == BTN_LEFT:
             robot.turn_left(self._speed)
@@ -204,4 +213,5 @@ while True:
     time.sleep_ms(50)
 
 '''
+
 
