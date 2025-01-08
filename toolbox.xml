@@ -126,6 +126,7 @@
     <block type="xbot_remote_control_init"/>
     <block type="xbot_remote_control_processing"/>
     <block type="xbot_remote_control_on_button_pressed" />
+    <block type="xbot_control_read_joystick" />
   </category>
 
 </xml>

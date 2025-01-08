@@ -2091,3 +2091,53 @@ Blockly.Python["xbot_control_gripper_slow"] = function (block) {
   
   return code;
 };
+
+Blockly.Blocks["xbot_control_read_joystick"] = {
+  init: function () {
+    this.jsonInit({
+      colour: ColorBlock,
+      tooltip: "",
+      message0: "đọc joystick %1 %2",
+      args0: [
+        {
+          "type": "field_dropdown",
+          "name": "joystick",
+          "options": [
+            [
+              "trái",
+              "al"
+            ],
+            [
+              "phải",
+              "ar"
+            ]
+          ]
+        },
+        {
+          "type": "field_dropdown",
+          "name": "data",
+          "options": [
+            [
+              "X",
+              "x"
+            ],
+            [
+              "Y",
+              "y"
+            ]
+          ]
+        }
+      ],
+      output: "Number",
+      helpUrl: "",
+    });
+  },
+};
+
+Blockly.Python["xbot_control_read_joystick"] = function (block) {
+  var joystick = block.getFieldValue("joystick");
+  var data = block.getFieldValue("data");
+  // TODO: Assemble Python into code variable.
+  var code = 'rc_mode.read_gamepad("' + joystick + data + '")';
+  return [code, Blockly.Python.ORDER_NONE];
+};
