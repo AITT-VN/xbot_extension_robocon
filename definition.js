@@ -2044,6 +2044,113 @@ Blockly.Python['xbot_remote_control_on_button_pressed'] = function (block) {
   
 };
 
+Blockly.Blocks["xbot_remote_control_read_button"] = {
+  init: function () {
+    this.jsonInit({
+      colour: ColorBlock,
+      tooltip: "",
+      message0: "nút %1 trên gamepad được nhấn",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "BUTTON",
+          options: [
+            [
+              {
+                "src": 'static/blocks/block_images/gamepad-square.png',
+                "width": 15,
+                "height": 15,
+                "alt": "*"
+              },
+              "x"
+            ],
+            [
+              {
+                "src": 'static/blocks/block_images/gamepad-circle.png',
+                "width": 15,
+                "height": 15,
+                "alt": "*"
+              },
+              "b"
+            ],
+            [
+              {
+                "src": 'static/blocks/block_images/gamepad-cross.png',
+                "width": 15,
+                "height": 15,
+                "alt": "*"
+              },
+              "a"
+            ],
+            [
+              {
+                "src": 'static/blocks/block_images/gamepad-triangle.png',
+                "width": 15,
+                "height": 15,
+                "alt": "*"
+              },
+              "y"
+            ],
+            ["L1", "l1"],
+            ["R1", "r1"],
+            ["L2", "l2"],
+            ["R2", "r2"],
+            [
+              {
+                "src": "static/blocks/block_images/59043.svg",
+                "width": 15,
+                "height": 15,
+                "alt": "*"
+              },
+              "dpad_up"
+            ],
+            [
+              {
+                "src": "static/blocks/block_images/959159.svg",
+                "width": 15,
+                "height": 15,
+                "alt": "*"
+              },
+              "dpad_down"
+            ],
+            [
+              {
+                "src": "static/blocks/block_images/arrow-left.svg",
+                "width": 15,
+                "height": 15,
+                "alt": "side left"
+              },
+              "dpad_left"
+            ],
+            [
+              {
+                "src": "static/blocks/block_images/arrow-right.svg",
+                "width": 15,
+                "height": 15,
+                "alt": "side right"
+              },
+              "dpad_right"
+            ],
+          ],
+        }
+      ],
+      output: "Boolean",
+      helpUrl: "",
+    });
+  },
+  getDeveloperVars: function () {
+    return ['rc_mode'];
+  }
+};
+
+Blockly.Python["xbot_remote_control_read_button"] = function (block) {
+  var button = block.getFieldValue("BUTTON");
+  // TODO: Assemble Python into code variable.
+  var code = 'rc_mode.read_gamepad("' + button + '") == 1';
+  return [code, Blockly.Python.ORDER_NONE];
+};
+
+
 Blockly.Blocks['xbot_control_gripper_slow'] = {
   init: function () {
     this.jsonInit(
